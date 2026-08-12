@@ -4,8 +4,7 @@
 
 ## 为什么需要这个仓库
 
-微信官网 CDN 只保留每个大版本的**最终热修** dmg（如 `WeChatMac_4.1.12.dmg`），历史构建号无法从官网下载。本仓库记录官网每次 dmg 更新的完整轨迹，并直接给出机器可读的构建号。
-已从 [zsbai/wechat-versions](https://github.com/zsbai/wechat-versions) 导入微信 4 全系列 **63 个历史版本**（含 4.0.x 旧格式），完整映射表见 **[docs/version-map.md](docs/version-map.md)**（含 wechat-antirecall 支持状态标注）。，供下游项目（如 [wechat-antirecall](https://github.com/fzlzjerry/wechat-antirecall)）在打包、适配、排障时零成本获取「版本号 + 构建号」。
+微信官网 CDN 只保留每个大版本的**最终热修** dmg（如 `WeChatMac_4.1.12.dmg`），历史构建号无法从官网下载。本仓库记录官网每次 dmg 更新的完整轨迹，并直接给出机器可读的构建号，内置微信 4 全系列 **63 个历史版本**存档（含 4.0.x 旧格式），完整映射表见 **[docs/version-map.md](docs/version-map.md)**（含 wechat-antirecall 支持状态标注），供下游项目（如 [wechat-antirecall](https://github.com/fzlzjerry/wechat-antirecall)）在打包、适配、排障时零成本获取「版本号 + 构建号」。
 
 ## Release 规范
 
@@ -33,7 +32,7 @@ Source and checksums
 - UpdateTime: ... (UTC)
 ```
 
-消费端只需读取最新 release 正文的 `BuildVersion` 行即可，无需下载 dmg。
+消费端只需读取最新 release 正文的 `BuildVersion` 行即可，无需下载 dmg。最新微信版本始终标记为 **Latest**（当前：`4.1.12.29-269341`），可通过 `gh release view` 或 `releases/latest` 端点获取。
 
 ## 如何消费（查询最新微信版本号 + 构建号）
 
@@ -49,9 +48,7 @@ curl -s https://raw.githubusercontent.com/fzlzjerry/wechat-antirecall/main/patch
 ## 运行机制
 
 - `.github/workflows/daily.yml`：每天 UTC 07:00 自动检测官网；`workflow_dispatch` 可手动触发（`force` 强制重发）。
-- `.github/workflows/import.yml`：手动触发，从 [zsbai/wechat-versions](https://github.com/zsbai/wechat-versions) 批量导入历史版本（`all` 全量 / `limit` 只导最新 N 个），已存在的 tag 自动跳过，可分批续跑。
 - `scripts/detect.py`：日常检测流程（抓官网 → HEAD 对比 MD5 → 下载 → 提取三键 → 发布）。
-- `scripts/import_history.py`：历史批量导入流程。
 - `scripts/common.py`：共享库（挂载 / 提取 / 校验和 / 发布）。
 
 ### 提取的三键（来自 `WeChat.app/Contents/Info.plist`）
@@ -67,9 +64,6 @@ curl -s https://raw.githubusercontent.com/fzlzjerry/wechat-antirecall/main/patch
 ```bash
 # 日常检测（含发布）
 python3 scripts/detect.py --force
-
-# 历史导入（--dry-run 只提取不发布；--all 全量；--limit N 只导最新 N 个）
-python3 scripts/import_history.py --limit 3 --dry-run
 ```
 
 依赖：macOS（`hdiutil`）、`gh` CLI（已登录或 `GH_TOKEN`）、`wget`。
