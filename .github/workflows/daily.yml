@@ -1,0 +1,23 @@
+name: Detect WeChat Version
+
+on:
+  schedule:
+    - cron: '0 7 * * *' # 每天 UTC 07:00（北京时间 15:00）
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force re-publish even if MD5 unchanged'
+        type: boolean
+        default: false
+
+jobs:
+  detect:
+    runs-on: macos-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect and publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/detect.py ${{ github.event.inputs.force == 'true' && '--force' || '' }}

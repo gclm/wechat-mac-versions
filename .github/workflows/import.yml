@@ -1,0 +1,41 @@
+name: Import History
+
+on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: 'Import scope'
+        type: choice
+        options:
+          - all
+          - limit
+        default: limit
+      limit:
+        description: 'Number of latest releases to import (when scope=limit)'
+        type: number
+        default: 3
+      dry_run:
+        description: 'Dry run: download and extract only, no publish'
+        type: boolean
+        default: false
+
+jobs:
+  import:
+    runs-on: macos-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import history from zsbai/wechat-versions
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ARGS=""
+          if [ "${{ github.event.inputs.scope }}" = "all" ]; then
+            ARGS="--all"
+          else
+            ARGS="--limit ${{ github.event.inputs.limit }}"
+          fi
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          python3 scripts/import_history.py $ARGS
