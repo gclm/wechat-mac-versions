@@ -4,7 +4,8 @@
 
 ## 为什么需要这个仓库
 
-微信官网 CDN 只保留每个大版本的**最终热修** dmg（如 `WeChatMac_4.1.12.dmg`），历史构建号无法从官网下载。本仓库记录官网每次 dmg 更新的完整轨迹，并直接给出机器可读的构建号，供下游项目（如 [wechat-antirecall](https://github.com/fzlzjerry/wechat-antirecall)）在打包、适配、排障时零成本获取「版本号 + 构建号」。
+微信官网 CDN 只保留每个大版本的**最终热修** dmg（如 `WeChatMac_4.1.12.dmg`），历史构建号无法从官网下载。本仓库记录官网每次 dmg 更新的完整轨迹，并直接给出机器可读的构建号。
+已从 [zsbai/wechat-versions](https://github.com/zsbai/wechat-versions) 导入微信 4 全系列 **63 个历史版本**（含 4.0.x 旧格式），完整映射表见 **[docs/version-map.md](docs/version-map.md)**（含 wechat-antirecall 支持状态标注）。，供下游项目（如 [wechat-antirecall](https://github.com/fzlzjerry/wechat-antirecall)）在打包、适配、排障时零成本获取「版本号 + 构建号」。
 
 ## Release 规范
 
@@ -57,7 +58,7 @@ curl -s https://raw.githubusercontent.com/fzlzjerry/wechat-antirecall/main/patch
 
 | 键 | 含义 | 示例 |
 | --- | --- | --- |
-| `WeChatBundleVersion` | 四段版本号（官方 UI 展示） | `4.1.12.29` |
+| `WeChatBundleVersion` | 四段版本号（官方 UI 展示）；4.0.x 时代无此键，退化为 `短版本+build.构建号` | `4.1.12.29` |
 | `CFBundleVersion` | 构建号（逆向/补丁匹配用） | `269341` |
 | `CFBundleShortVersionString` | 三段版本号 | `4.1.12` |
 
