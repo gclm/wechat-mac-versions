@@ -6,9 +6,10 @@
 
 用法：
   python3 scripts/import_history.py --all              # 导入全部
+  python3 scripts/import_history.py --v4-only          # 只导入微信 4 系列（4.x / v4.x）
   python3 scripts/import_history.py --limit 5          # 只导入 5 个（最新优先）
   python3 scripts/import_history.py --tag 4.1.11.55    # 导入指定上游 tag
-  python3 scripts/import_history.py --all --dry-run    # 只提取不发布
+  python3 scripts/import_history.py --v4-only --dry-run # 只提取不发布
 
 依赖：gh CLI（GITHUB_TOKEN）+ macOS（hdiutil）。
 """
@@ -125,6 +126,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="从 zsbai/wechat-versions 导入历史版本")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--all", action="store_true", help="导入全部历史版本（跳过已存在）")
+    group.add_argument("--v4-only", action="store_true", help="只导入微信 4 系列（tag 以 4. 或 v4. 开头）")
     group.add_argument("--limit", type=int, metavar="N", help="只导入最新 N 个")
     group.add_argument("--tag", metavar="TAG", help="只导入指定上游 tag")
     parser.add_argument("--dry-run", action="store_true", help="只下载提取，不发布")
@@ -140,6 +142,9 @@ def main() -> int:
         if not releases:
             log(f"Upstream tag not found: {args.tag}")
             return 1
+    elif args.v4_only:
+        releases = [r for r in releases if r["tag_name"].startswith(("4.", "v4."))]
+        log(f"Filtered to v4 series: {len(releases)} releases.")
     elif args.limit:
         releases = releases[: args.limit]
 

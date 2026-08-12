@@ -8,8 +8,9 @@ on:
         type: choice
         options:
           - all
+          - v4
           - limit
-        default: limit
+        default: v4
       limit:
         description: 'Number of latest releases to import (when scope=limit)'
         type: number
@@ -22,7 +23,9 @@ on:
 jobs:
   import:
     runs-on: macos-latest
-    timeout-minutes: 180
+    timeout-minutes: 300
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Import history from zsbai/wechat-versions
@@ -32,6 +35,8 @@ jobs:
           ARGS=""
           if [ "${{ github.event.inputs.scope }}" = "all" ]; then
             ARGS="--all"
+          elif [ "${{ github.event.inputs.scope }}" = "v4" ]; then
+            ARGS="--v4-only"
           else
             ARGS="--limit ${{ github.event.inputs.limit }}"
           fi
